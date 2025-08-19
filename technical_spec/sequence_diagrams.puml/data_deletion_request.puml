@@ -1,0 +1,14 @@
+@startuml Data_Deletion_Request
+actor Borrower
+participant "UI" as UI
+participant "Edge Fn" as EDGE
+participant "DB" as DB
+participant "Storage" as ST
+
+Borrower -> UI: Request deletion
+UI -> EDGE: POST /gdpr/delete {borrowerId}
+EDGE -> DB: Mark borrower+apps as "DeletionPending"
+EDGE -> ST: Delete documents by storagePath
+EDGE -> DB: Purge PII fields (soft-delete or redact)
+EDGE -> DB: Insert AuditLog
+@enduml

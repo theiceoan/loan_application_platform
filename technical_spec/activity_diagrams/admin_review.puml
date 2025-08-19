@@ -1,0 +1,18 @@
+@startuml Admin_Review_Application
+start
+:Application status = PendingReview;
+if (KYC Docs uploaded?) then (yes)
+  if (Credit Check Result available?) then (yes)
+    :Admin manually reviews application;
+    :Decision = Approve / Reject / Request More Info;
+    :Update Application.status in DB;
+    :Trigger Email Notification via Edge Function;
+    :Log action in AuditLog;
+  else (no)
+    :Wait for Credit Check result;
+  endif
+else (no)
+  :Request More Info from borrower;
+endif
+stop
+@enduml

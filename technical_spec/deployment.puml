@@ -1,0 +1,29 @@
+@startuml Deployment
+node "User Devices" {
+  artifact "Browser" as Browser
+}
+
+node "Vercel (UK edge)" {
+  component "Next.js/React" as FE
+}
+
+node "Supabase (UK Region)" {
+  database "Postgres (PII, Loans, Audit)" as DB
+  component "Auth (RLS + JWT)" as AUTH
+  component "Storage (Documents)" as STOR
+  component "Edge Functions (Serverless)" as EDGE
+}
+
+node "3rd Party Providers" {
+  component "Credit API" as CREDIT
+  component "Email API" as EMAIL
+}
+
+Browser --> FE
+FE --> AUTH
+FE --> DB
+FE --> STOR
+FE --> EDGE
+EDGE --> CREDIT
+EDGE --> EMAIL
+@enduml

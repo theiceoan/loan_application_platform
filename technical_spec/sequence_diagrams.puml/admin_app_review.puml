@@ -1,0 +1,19 @@
+@startuml Admin_Review_Application
+actor Admin
+participant "Admin UI" as AUI
+participant "Supabase DB" as DB
+participant "Edge Function" as EDGE
+participant "Email API (Resend/SendGrid)" as EMAIL
+
+Admin -> AUI: Open Dashboard
+AUI -> DB: Query applications (status=PendingReview)
+Admin -> AUI: View selected application + KYC docs + credit check result
+Admin -> AUI: Make decision (Approve / Reject / More Info)
+AUI -> DB: Update Application.status
+AUI -> EDGE: POST /notify {template, to}
+EDGE -> EMAIL: Send email to borrower
+EMAIL --> EDGE: 202 Accepted
+EDGE -> DB: Insert AuditLog {adminId, action, timestamp}
+note right of EDGE: All admin actions logged; manual decisions only
+
+@enduml

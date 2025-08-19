@@ -1,0 +1,26 @@
+@startuml Architecture
+title Component View (Chosen Stack)
+
+package "Frontend (Vercel)" {
+  [Next.js/React UI]
+}
+
+package "Backend" {
+  [Supabase: Auth] 
+  [Supabase: Postgres]
+  [Supabase: Storage]
+  [Serverless Functions (Supabase Edge Functions)]
+}
+
+package "3rd Parties" {
+  [Credit Kudos or Creditsafe or ClearScore Business]
+  (Email: Resend/SendGrid)
+}
+
+[Next.js/React UI] --> [Supabase: Auth]
+[Next.js/React UI] --> [Supabase: Postgres]
+[Next.js/React UI] --> [Supabase: Storage]
+[Next.js/React UI] --> [Serverless Functions (Supabase Edge Functions)]
+[Serverless Functions (Supabase Edge Functions)] --> [Credit Kudos or Creditsafe or ClearScore Business]
+[Serverless Functions (Supabase Edge Functions)] --> (Email: Resend/SendGrid)
+@enduml

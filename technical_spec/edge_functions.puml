@@ -1,0 +1,70 @@
+@startuml Edge_Functions
+title Edge Functions (HTTP)
+
+' --- Credit Check ---
+interface POST_/credit-check {
+  input: { applicationId: UUID }
+  auth: admin/service (server-initiated) or system after submit
+  output: { result: "Pass" | "Fail" | "Error", provider: string, checkedAt: ts }
+  note: "Advisory only; loan decision is manual by admin"
+}
+
+' --- Notifications ---
+interface POST_/notify {
+  input: { to: string, template: "approved"|"rejected"|"more_info"|"received", params: map }
+  auth: admin/service
+  output: { status: "queued" }
+  note: "Admin manually triggers notifications"
+}
+
+' --- GDPR Delete ---
+interface POST_/gdpr/delete {
+  input: { borrowerId: UUID }
+  auth: borrower(self) or admin
+  output: { status: "scheduled" | "done" }
+  note: "PII removed, audit logs retained"
+}
+
+' --- Loan Applications ---
+interface POST_/loan/apply {
+  input: { borrowerId: UUID, amount: number, termMonths: int, purpose: string }
+  auth: borrower(self)
+  output: { applicationId: UUID, status: "submitted" | "error" }
+}
+
+interface POST_/loan/decision {
+  input: { applicationId: UUID, decision: "approve"|"reject", notes?: string }
+  auth: admin/service
+  output: { status: "updated", decidedAt: ts }
+  note: "Manual decision by admin based on credit check result"
+}
+
+interface GET_/loan/status {
+  input: { applicationId: UUID }
+  auth: borrower(self) or admin
+  output: { status: "pending"|"approved"|"rejected", decidedAt?: ts }
+}
+
+' --- KYC / Documents ---
+interface POST_/kyc/submit {
+  input: { borrowerId: UUID, documents: [fileRefs] }
+  auth: borrower(self)
+  output: { status: "received"|"error", kycId: UUID }
+  note: "Manual review by admin"
+}
+
+interface GET_/kyc/status {
+  input: { borrowerId: UUID }
+  auth: borrower(self) or admin
+  output: { status: "pending"|"verified"|"failed", checkedAt?: ts }
+}
+
+' --- Admin Utilities ---
+interface POST_/report/generate {
+  input: { type: "loans"|"users", range: { from: date, to: date } }
+  auth: admin
+  output: { reportUrl: string, generatedAt: ts }
+  note: "Phase 1 reports are basic; no repayment reports yet"
+}
+
+@enduml

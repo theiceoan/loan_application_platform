@@ -1,0 +1,21 @@
+@startuml Submit_Application
+actor Borrower
+participant "React UI" as UI
+participant "Supabase Auth" as AUTH
+participant "Supabase DB" as DB
+participant "Edge Function" as EDGE
+participant "Credit Provider" as CREDIT
+
+Borrower -> UI: Open Loan Application Form
+UI -> AUTH: verify session
+Borrower -> UI: Submit Form + KYC Documents
+UI -> DB: Insert Application + KYC references, status=submitted
+UI -> EDGE: POST /credit-check {applicationId}
+EDGE -> DB: Load minimal application data
+EDGE -> CREDIT: Fetch credit check result (pass/fail)
+CREDIT --> EDGE: Return result
+EDGE -> DB: Upsert CreditCheck result
+DB -> UI: Update Application.status=PendingReview
+note right of DB: Application is now awaiting **manual admin review**
+
+@enduml

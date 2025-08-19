@@ -1,0 +1,21 @@
+@startuml Security_Architecture
+title Security Overview
+package "Auth & Roles" {
+  [Supabase Auth: JWT]
+  [Role: borrower]
+  [Role: admin]
+}
+package "Data Controls" {
+  [RLS Policies per table]
+  [Audit Logs]
+  [PII Minimization]
+}
+package "Secrets" {
+  [Edge Fn Env Vars: CREDIT_API_KEY, EMAIL_API_KEY]
+}
+[borrower] --> [RLS Policies per table]
+[admin] --> [RLS Policies per table]
+[Supabase Auth: JWT] --> [borrower]
+[Supabase Auth: JWT] --> [admin]
+[Edge Fn Env Vars: CREDIT_API_KEY, EMAIL_API_KEY] ..> [Edge Functions]
+@enduml

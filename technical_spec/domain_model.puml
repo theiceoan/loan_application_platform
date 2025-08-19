@@ -1,0 +1,75 @@
+@startuml Domain_Model
+class Borrower {
+  +id: UUID
+  +email: string
+  +phone: string
+  +firstName: string
+  +lastName: string
+  +dob: date
+  +studentStatus: enum{Student, Employed, Both}
+  +createdAt: timestamp
+}
+
+class Application {
+  +id: UUID
+  +borrowerId: UUID
+  +amountRequested: decimal
+  +loanType: enum{ShortTerm, Installment}
+  +termMonths: int
+  +reason: text
+  +status: enum{Submitted, PendingReview, MoreInfo, Approved, Rejected, Disbursed, Closed}
+  +createdAt: timestamp
+  +updatedAt: timestamp
+}
+
+class Document {
+  +id: UUID
+  +applicationId: UUID
+  +type: enum{ID, StudentProof, EmploymentProof, BankStatement, Other}
+  +storagePath: string
+  +uploadedAt: timestamp
+  +hashSha256: string
+}
+
+class CreditCheck {
+  +id: UUID
+  +applicationId: UUID
+  +provider: enum{CreditKudos, Creditsafe, ClearScore}
+  +result: enum{Pass, Fail, Error}
+  +rawScoreRedacted: string
+  +checkedAt: timestamp
+}
+
+class AdminUser {
+  +id: UUID
+  +email: string
+  +createdAt: timestamp
+  +role: enum{Admin}  // equal permission
+}
+
+class Loan {
+  +id: UUID
+  +applicationId: UUID
+  +principal: decimal
+  +interestRateFixedAPR: decimal
+  +termMonths: int
+  +disbursedAt: timestamp
+  +status: enum{Active, Settled, Defaulted}
+}
+
+class AuditLog {
+  +id: UUID
+  +actor: string  // adminId or system
+  +action: string
+  +entity: string
+  +entityId: UUID
+  +timestamp: timestamp
+  +ip: string
+}
+
+Borrower "1" -- "0..*" Application
+Application "1" -- "0..*" Document
+Application "1" -- "0..1" CreditCheck
+Application "1" -- "0..1" Loan
+AdminUser "1" -- "0..*" AuditLog
+@enduml

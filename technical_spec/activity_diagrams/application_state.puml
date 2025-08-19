@@ -1,0 +1,12 @@
+@startuml Application_State
+[*] --> Submitted
+Submitted --> PendingReview : Auto credit check done (advisory)
+PendingReview --> MoreInfo : Admin requests additional info / docs
+MoreInfo --> PendingReview : Borrower resubmits
+PendingReview --> Approved : Admin manual decision
+PendingReview --> Rejected : Admin manual decision
+note right of PendingReview
+  Manual admin review based on credit check
+  and KYC documents
+end note
+@enduml
